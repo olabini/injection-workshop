@@ -53,6 +53,4 @@ If the characters "{ :;};" are included as the function definition, any arbitrar
 The Common Gateway Interface (CGI) vector (an interface between a web server and executables that produce dynamic content) has received the bulk of the focus from attackers thus far. However, the reac    h of the BASH Shellshock bug doesn’t stop at web servers. Any application that relies on user-controlled data to set OS-level environment variables and then invokes the shell from that same context can trigger the vulnerability. In other words, web applications relying on a specific type of user input can be manipulated to make clients (i.e., consumers) vulnerable to attack.
  
  Because CGI relies on environment variables set in the header which are later interpreted to generate dynamic content, it is vulnerable to this kind of attack.
->>>>>>> CK Adding in shellshock demo info
 
-Built using [reveal.js 3.0](https://github.com/hakimel/reveal.js/tree/3.0.0)
