@@ -140,10 +140,24 @@ Note:
 <section>
 <h2>HTTP header injection</h2>
 
+<pre class="medcode"><code>http://site.com/account</code></pre>
+<p>=></p>
 <pre class="medcode"><code align="left">HTTP/1.1 302 Moved Temporarily
 Location: http://site.com/index?page=account
 ...</code></pre>
-<pre class="medcode"><code class="nohighlight">page=account%0d%0aContent-Length:%200%0d%0a%0d%0aHTTP/1.1%20200%20OK%0d%0aContent-Length:%2031%0d%0a%0d%0a&amp;lt;html&amp;gt;hacked&amp;lt;/html&amp;gt;</code></pre>
+<p>What happens if we add more to query?</p>
+<pre class="medcode"><code class="nohighlight">/account%0d%0aContent-Length:%200%0d%0a%0d%0aHTTP/1.1%20200%20OK%0d%0aContent-Length:%2031%0d%0a%0d%0a&amp;lt;html&amp;gt;hacked&amp;lt;/html&amp;gt;</code></pre>
+
+<aside class="notes">
+Note:
+- Ask audience: what do you think will happen above?
+</aside>
+</section>
+
+<section>
+<h2>HTTP header injection (cont.)</h2>
+
+<pre class="medcode"><code class="nohighlight">/account%0d%0aContent-Length:%200%0d%0a%0d%0aHTTP/1.1%20200%20OK%0d%0aContent-Length:%2031%0d%0a%0d%0a&amp;lt;html&amp;gt;hacked&amp;lt;/html&amp;gt;</code></pre>
 <p>=></p>
 <pre class="medcode"><code align="left">HTTP/1.1 302 Moved Temporarily
 Location: http://site.com/index?page=account
@@ -156,8 +170,8 @@ Content-length: 31
 
 <aside class="notes">
 Note:
-- Ask audience: whats happening above?<br/>
 - Also known as HTTP response splitting<br/>
+- Also fits under OWASP A10-Unvalidated Redirects and Forwards<br/>
 - The %0d%0a sequences get translated to \r\n (carriage return, newline) when output<br/>
 - The client would send the next request and the "hacked" message would already be on the wire
 </aside>
