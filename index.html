@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
 
-	<title>Injection, part 2</title>
+	<title>Injection, part 1</title>
 
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -46,7 +46,7 @@
 <div class="reveal">
 <div class="slides">
 
-<section data-markdown data-separator-notes="^Note:">
+<section data-markdown data-separator-notes="^Note:" data-speaker="Chelsea">
 # Injection
 
 ## OWASP #1
@@ -56,53 +56,77 @@ Note:
 - We're going to talk about more types of injection
 </section>
 
-<section data-markdown data-separator-notes="^Note:">
+<section data-markdown data-separator-notes="^Note:" data-speaker="Chelsea">
 # But first
 
-## Why care? 
+## Why care?
 
 (always a valid question)
 
 </section>
 
-<section>
-<img width="70%" src="images/social_security.png">
+<section data-markdown data-separator-notes="^Note:" data-speaker="Ola">
+## Why The Initiative? (tm)
 </section>
 
-<section>
+<section data-speaker="Chelsea">
 <img width="75%" src="images/jen_law.png">
 </section>
 
-<section data-markdown data-separator-notes="^Note:">
+<section data-markdown data-separator-notes="^Note:" data-speaker="Chelsea">
 
-To me, security is a kind of social justice. 
+To me, security is a kind of social justice.
 
 </section>
 
-<section data-markdown data-separator-notes="^Note:">
-## So. On that note :) 
+<section data-markdown data-separator-notes="^Note:" data-speaker="Ola">
+## So. On that note :)
 ### Types of injection
 
 - It's not just about SQL injection
-- Injection can happen anywhere code or instructions containing user input are interpeted
+- Injection can happen anywhere user input is interpeted
 
-Note:
-- Injection can happen anywhere that the addition of code might change the course of execution
-- Ask the audience: name some other languages or techniques that are impacted
 </section>
 
-<section data-markdown data-separator-notes="^Note:">
-## Where can injection occur? 
+<section data-markdown data-separator-notes="^Note:" data-speaker="Ola">
+## Other types of injection
+
+- Command injection
+- Environment variable injection
+- Regular expression injection
+- Path injection
+- Header injection
+- LDAP injection
+- JavaScript injection (XSS)
+</section>
+
+<!--
+- URL path
+- URL parameters
+- Form parameters
+- Log files
+- File uploads
+- HTTP Headers
+- IPv6 extended attributes
+- DNS queries
+- Information in the database
+- Responses from remote systems (in microservice architectures)
+-->
+
+<section data-markdown data-separator-notes="^Note:" data-speaker="Chelsea">
+## Where can injection occur?
 
 - Forms (this we all know)
-- Urls (even more dangerous when bitly encoded)
+- URLs (even more dangerous when bitly encoded)
+- HTTP Headers
 - File uploads
 - Log files
-- etc. 
+- etc.
 
 </section>
 
-<section>
+<section data-speaker="Chelsea">
+<!-- http://localhost:4567/path?file=../../../.zshenv -->
 <h2>Path traversal</h2>
 
 <pre class="bigcode"><code>http://site.com/view.php?file=report.pdf</code></pre>
@@ -118,11 +142,12 @@ bin:x:2:2:bin:/bin:/bin/sh
 
 <aside class="notes">
 - Allows an attacker to access files/directories/commands outside the intended directory
-- We can also do things like 
+- We can also do things like
 </aside>
 </section>
 
-<section>
+<section data-speaker="Ola">
+<!-- http://localhost:4567/command?host=olabini.se%3bcat%20~/.zshenv -->
 <h2>Shell (command) injection</h2>
 
 <pre class="bigcode"><code>print system("host " + hostname)</code></pre>
@@ -145,7 +170,7 @@ bin:x:2:2:bin:/bin:/bin/sh
 </aside>
 </section>
 
-<section>
+<section data-speaker="Chelsea">
 <h2>Shellshock</h2>
 
 <pre class="bigcode"> <code align="left"># exporting a bash function named x
@@ -164,14 +189,14 @@ $ env x='() { :; }'</code></pre>
 </aside>
 </section>
 
-<section data-markdown data-separator-notes="^Note:">
+<section data-markdown data-separator-notes="^Note:" data-speaker="Chelsea">
 ## demo
 
 Note:
 - Demo Shellshock vulnerability according to instructions
 </section>
 
-<section>
+<section data-speaker="Ola">
 <h2>HTTP header injection</h2>
 
 <pre class="medcode"><code>http://site.com/account</code></pre>
@@ -188,7 +213,7 @@ Note:
 </aside>
 </section>
 
-<section>
+<section data-speaker="Ola">
 <h2>HTTP header injection (cont.)</h2>
 
 <pre class="medcode"><code class="nohighlight">/account%0d%0aContent-Length:%200%0d%0a%0d%0aHTTP/1.1%20200%20OK%0d%0aContent-Length:%2031%0d%0a%0d%0a&amp;lt;html&amp;gt;hacked&amp;lt;/html&amp;gt;</code></pre>
@@ -211,7 +236,7 @@ Note:
 </aside>
 </section>
 
-<section>
+<section data-speaker="Chelsea">
 <h2>Javascript injection</h2>
 
 <pre class="bigcode"><code class="javascript" align="left">json = '{ "data": "some data" }';
@@ -229,7 +254,125 @@ Note:
 </aside>
 </section>
 
-<section data-markdown data-separator-notes="^Note:">
+<section data-markdown data-separator-notes="^Note:" data-speaker="Chelsea">
+## And now: SQL Injection
+</section>
+
+<section data-markdown data-separator-notes="^Note:" data-speaker="Chelsea"><script type="text/template">
+<img width="100%" src="bobby-tables.png">
+<pre style="text-align: center; font-size: 1em"><code>Robert'); DROP TABLE Students;--</code></pre>
+</script></section>
+
+<section data-speaker="Chelsea">
+  <pre class="bigcode"><code>$name = "Robert'); DROP TABLE Students;--"</code></pre>
+  <pre class="bigcode"><code>SELECT * FROM Students WHERE name = '$name'</code></pre>
+  <p>=></p>
+  <pre class="medcode"><code>SELECT * FROM Students WHERE name = 'Robert'); DROP TABLE Students;--'</code></pre>
+</section>
+
+<section data-speaker="Ola">
+  <h2>Vulnerable App</h2>
+<pre class="bigcode" style="text-align: left"><code class="bash">$ telnet $IP 8888
+Hi what is your first name? Bob
+Hi, Bob Smith
+</code></pre>
+  <br/>
+<pre class="bigcode" style="text-align: left"><code>// tip 1: sql used by app
+select * from users where first_name = 'name'
+</code></pre>
+
+<br/>
+
+<pre class="bigcode" style="text-align: left"><code>// tip 2: derby is wierd
+select * from x -- // crash
+select * from x -- anytext // valid
+</code></pre>
+  <aside class="notes">
+    <em>optional</em>
+    <ul>
+      <li>start application on your machine with ncat:</li>
+      <li>ncat -lktc 'java -jar target/injection-1.0-SNAPSHOT-jar-with-dependencies.jar' 0.0.0.0 8888</li>
+    </ul>
+  </aside>
+</section>
+
+<section data-markdown data-separator-notes="^Note:" data-speaker="Ola">
+## demo
+
+Note:
+
+- java -jar target/injection-1.0-SNAPSHOT-jar-with-dependencies.jar
+- ' or 1=1 --comment
+- for i in $(seq 0 10); do echo "' or 1=1 offset $i rows --comment" | java -jar target/injection-1.0-SNAPSHOT-jar-with-dependencies.jar; done
+</section>
+
+<section data-markdown data-separator-notes="^Note:" data-speaker="Ola">
+## So what do we have to lose?
+
+- Confidentiality ✓
+- Integrity ✓
+- Availability ✓
+
+Note:
+- Injection vulnerabilities threaten all three
+</section>
+
+<section data-markdown data-separator-notes="^Note:" data-speaker="Chelsea">
+## Secure Code Checklist
+
+- using parameterized queries
+- encoding untrusted data
+- validation (in as many layers as possible)
+- whitelisting when possible
+- fail gracefully
+
+Note:
+
+- using parameterized queries
+  - these make the database do the interpolation for you
+  - never concatinate strings to create queries!
+- encoding untrusted data
+  - untrusted data is the most fundamental idea of secure coding
+  - always know when data is potentially evil
+  - chose encoding over sanitization
+- validation (in as many layers as possible)
+  - can help make attacks more difficult
+  - but is not a solution in and of itself
+- whitelisting when possible
+  - accepting untrusted data is dangerous
+  - if there is no need to, don't!
+- fail gracefully
+</section>
+
+<section data-markdown data-separator-notes="^Note:" data-speaker="Chelsea">
+## Fix it!
+
+    git clone https://github.com/jacksingleton/injection-workshop.git
+
+    cd injection
+
+    cat README-participant.md
+
+Note:
+
+*hands on option*
+
+- move around the room and help each pair implement the fix
+</section>
+
+<section data-markdown data-separator-notes="^Note:" data-speaker="Ola">
+## Learn more
+
+- sql injection prevention cheat sheet: *https://www.owasp.org/index.php/SQL_Injection_Prevention_Cheat_Sheet*
+- owasp page: *https://www.owasp.org/index.php/Top_10_2013-A1-Injection*
+- sqlmap: *http://sqlmap.org/*
+
+Note:
+- owasp references are good to look at when you think you're at risk of an injection attack
+- sqlmap is a tool for automating sql injection, fun to play around with in your free time
+</section>
+
+<section data-markdown data-separator-notes="^Note:" data-speaker="Chelsea/Ola">
 ## Conclusion
 
 - injection can happen anywhere user input is interpreted
